@@ -19,7 +19,7 @@ type Item struct {
 func scanAdjacent(i *Item, world [][]rune) {
 
 	// If we have start_pos 3,3 and len 3, we wnat to verify the scope of 2,2 => 2,7; 3,2 => 3,7 and 4,2 => 4,7.
-	sr, sc, er, ec := i.start_pos[0], i.start_pos[1], i.start_pos[0]+i.len+1, i.start_pos[1]+1
+	sr, sc, er, ec := i.start_pos[0], i.start_pos[1], i.start_pos[0]+i.len, i.start_pos[1]+1
 	limitr, limitc := len(world[0])-1, len(world)-1
 	if sr != 0 {
 		sr = sr - 1
@@ -105,7 +105,7 @@ func main() {
 	sum := 0
 	for _, it := range items {
 		scanAdjacent(it, column)
-		// fmt.Println("\t\t", it.Number, it.Adjacent)
+		fmt.Println(it.Number, it.Adjacent)
 		if it.Adjacent {
 			nb, _ := strconv.Atoi(it.Number)
 			sum += nb

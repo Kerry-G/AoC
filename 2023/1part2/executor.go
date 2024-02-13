@@ -21,16 +21,13 @@ func reverse(s string) string {
 
 func main() {
 
+	acc := 0
 	file, err := os.Open("resources/input")
-
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer file.Close()
-
 	scanner := bufio.NewScanner(file)
-
-	acc := 0
 	for scanner.Scan() {
 		line := scanner.Text()
 
