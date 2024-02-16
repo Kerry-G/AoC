@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"log"
-	"math"
 	"os"
 	"strconv"
 	"strings"
@@ -14,10 +13,12 @@ type Case struct {
 	id             int
 	ownNumbers     map[int]bool
 	winningNumbers map[int]bool
+	amount         int
 }
 
 func readCaseFromString(s string) Case {
-	token := strings.Split(s, " ")
+	// Note to myself: Fields is much more appropriate than Split(s, " ") in this case!
+	token := strings.Fields(s)
 	id := -1
 	ownNumbers := map[int]bool{}
 	winningNumbers := map[int]bool{}
@@ -32,12 +33,6 @@ func readCaseFromString(s string) Case {
 			id, _ = strconv.Atoi(strings.Trim(t, ":"))
 			continue
 		}
-
-		if len(t) == 0 {
-			// Ignore empty spaces that happen when there is two spaces in the original string
-			continue
-		}
-
 		// back to the main program
 		if separator {
 			number, _ := strconv.Atoi(t)
@@ -51,7 +46,7 @@ func readCaseFromString(s string) Case {
 			ownNumbers[number] = true
 		}
 	}
-	c := Case{id, ownNumbers, winningNumbers}
+	c := Case{id, ownNumbers, winningNumbers, 1}
 	return c
 }
 
@@ -81,14 +76,23 @@ func main() {
 		cases = append(cases, readCaseFromString(line))
 	}
 
-	points := 0.0
-	for _, c := range cases {
-		matchNumbers := intersect(c.winningNumbers, c.ownNumbers)
-		if len(matchNumbers) == 0 {
-			// no match, better luck next time
-			continue
+	nbOfCases := len(cases)
+	for idx, _ := range cases {
+		matchNumbers := intersect(cases[idx].winningNumbers, cases[idx].ownNumbers)
+		nbOfMatches := len(matchNumbers)
+		for a := 0; a < cases[idx].amount; a++ {
+			for i := 1; i <= nbOfMatches; i++ {
+				if (idx + i) > nbOfCases-1 {
+					continue
+				}
+				cases[idx+i].amount++
+			}
 		}
-		points += math.Pow(2, float64(len(matchNumbers)-1))
 	}
-	fmt.Println("Points: ", points)
+	answer := 0
+	for _, c := range cases {
+		fmt.Println("Card id: ", c.id, " amount:", c.amount)
+		answer += c.amount
+	}
+	fmt.Println(answer)
 }
