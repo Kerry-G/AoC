@@ -37,17 +37,48 @@ type Step struct {
 	distance  int
 }
 
+func (ss Step) String() string {
+	return ss.direction.String() + " " + strconv.Itoa(ss.distance)
+}
+
 type Dial struct {
 	current int
 }
 
-func (dial *Dial) turn(step Step) {
+func (dial *Dial) turn(step Step) int {
+	// Handle step distance over 100 to a 2 digit distance and keep the amount of click it would add
+	click := step.distance / 100
+	if click < 0 {
+		click = -click
+	}
+	step.distance = step.distance % 100
+
+	temp := dial.current
 	if step.direction == Left {
 		dial.current -= step.distance
 	} else {
 		dial.current += step.distance
 	}
+
+	if dial.current/100 == 1 && dial.current != 100 {
+		click += 1
+	}
 	dial.current = dial.current % 100
+
+	// if dial.current went negative, set it back to a normal number
+	if dial.current < 0 {
+		dial.current = 100 + dial.current
+		if temp != 0 {
+			click += 1
+		}
+	}
+
+	// add a click if it did finish with 0
+	if dial.current == 0 {
+		click += 1
+	}
+
+	return click
 }
 
 func main() {
@@ -62,7 +93,6 @@ func main() {
 
 	scanner := bufio.NewScanner(file)
 	partOne(*scanner)
-	// partTwo(*scanner)
 }
 
 func partOne(scanner bufio.Scanner) {
@@ -79,17 +109,12 @@ func partOne(scanner bufio.Scanner) {
 	dial := Dial{50}
 	sum := 0
 	for _, step := range steps {
-		dial.turn(step)
-		if dial.current == 0 {
-			sum += 1
-		}
+		fmt.Println("Step: ", step)
+		click := dial.turn(step)
+		fmt.Println("Dial counter:", dial.current)
+		sum += click
+		fmt.Println("Click: ", click)
 	}
 	println(sum)
 
-}
-
-func partTwo(scanner bufio.Scanner) {
-	for scanner.Scan() {
-
-	}
 }
